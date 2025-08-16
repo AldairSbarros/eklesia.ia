@@ -1,0 +1,56 @@
+/// Compartilhamento de sermão via link público
+model SharedSermon {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  tema      String
+  textoBase String
+  topicos   Int
+  versos    Int
+  ilustracao String
+  conteudo  String
+  createdAt DateTime @default(now())
+  shareId   String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+}
+// Prisma schema for PostgreSQL
+// Atualize os dados de conexão conforme necessário
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Payment {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  status     String
+  method     String
+  amount     Float
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id])
+}
+
+/// Modelo para textos ingeridos e busca semântica
+model IngestedText {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  filename  String
+  text      String
+  embedding Vector? @db.Vector(384) // 384 dimensões para MiniLM, ajuste conforme modelo
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id])
+}

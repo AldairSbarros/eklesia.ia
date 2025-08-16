@@ -1,0 +1,54 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: eklesiaia
+      POSTGRES_USER: eklesia
+      POSTGRES_PASSWORD: eklesia123
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    command: ["postgres", "-c", "shared_preload_libraries=vector"]
+
+  backend:
+    build: ./backend
+    restart: always
+    environment:
+      DATABASE_URL: postgres://eklesia:eklesia123@postgres:5432/eklesiaia
+      JWT_SECRET: sua_chave_jwt
+      BIBLE_API_KEY: sua_api_key_biblia
+      PAGSEGURO_TOKEN: seu_token_pagseguro
+      HF_TOKEN: seu_token_huggingface
+      OLLAMA_URL: http://ollama:11434
+      OLLAMA_MODEL: llama3
+      PUBLIC_URL: http://localhost
+    ports:
+      - "3001:3001"
+    depends_on:
+      - postgres
+      - ollama
+
+  frontend:
+    build: ./frontend
+    restart: always
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+  ollama:
+    image: ollama/ollama:latest
+    restart: always
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    # Para baixar o modelo automaticamente, descomente a linha abaixo:
+    # command: ["ollama", "pull", "llama3"]
+
+volumes:
+  pgdata:
+  ollama_data:

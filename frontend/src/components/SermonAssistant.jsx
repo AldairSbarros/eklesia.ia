@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { buscarMapa, buscarImagens, buscarDadosHistoricos, buscarArtefatos } from '../services/bibleEnrichment';
 import axios from 'axios';
 import { conversarComIA } from '../services/llmApi';
 import SermonExport from './SermonExport';
 import SermonShare from './SermonShare';
+import PalavraOriginal from './PalavraOriginal';
 
 export default function SermonAssistant() {
   const [step, setStep] = useState(0);
@@ -13,6 +15,7 @@ export default function SermonAssistant() {
   const [verses, setVerses] = useState(3);
   const [illustration, setIllustration] = useState(false);
   const [sermon, setSermon] = useState(null);
+  const [enriquecimento, setEnriquecimento] = useState(null);
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState([
     { role: 'system', content: 'Você é Eklesia IA, um assistente para criação de sermões cristãos. Guie o usuário passo a passo, faça perguntas e gere sermões personalizados.' }
@@ -32,6 +35,7 @@ export default function SermonAssistant() {
 
   const handleSubmit = async () => {
     setLoading(true);
+    setEnriquecimento(null);
     let base = baseText;
     if (baseChoice === 'auto') {
       const bib = await fetchBibleBase();
@@ -46,7 +50,15 @@ export default function SermonAssistant() {
     setMessages(novaConversa);
     setHistory(h => [...h, { role: 'user', content: userPrompt }]);
     try {
-      const resposta = await conversarComIA(novaConversa);
+      // Enriquecimento paralelo
+      const termoBusca = theme || base;
+      const [mapa, imagens, dados, artefatos, resposta] = await Promise.all([
+        buscarMapa(termoBusca),
+        buscarImagens(termoBusca),
+        buscarDadosHistoricos(termoBusca),
+        buscarArtefatos(termoBusca),
+        conversarComIA(novaConversa)
+      ]);
       setHistory(h => [...h, { role: 'assistant', content: resposta }]);
       setSermon({
         tema: theme,
@@ -56,6 +68,7 @@ export default function SermonAssistant() {
         ilustracao: illustration ? 'Incluindo ilustração...' : 'Sem ilustração',
         conteudo: resposta
       });
+      setEnriquecimento({ mapa, imagens, dados, artefatos });
     } catch (err) {
       setHistory(h => [...h, { role: 'assistant', content: 'Erro ao consultar IA: ' + err.message }]);
       setSermon({ conteudo: 'Erro ao consultar IA: ' + err.message });
@@ -75,8 +88,91 @@ export default function SermonAssistant() {
           <p><b>Versos por tópico:</b> {sermon.versos}</p>
           <p><b>Ilustração:</b> {sermon.ilustracao}</p>
           <pre style={{ background: '#eee', padding: 12 }}>{sermon.conteudo}</pre>
+          {/* Sugestão automática de consulta ao original para termos conhecidos */}
+          {['amor', 'ágape', 'agape', 'filéo', 'fileo', 'eros', 'storge'].some(t => (sermon.tema || '').toLowerCase().includes(t)) && (
+            <div>
+              <h4>Palavras no original relacionadas ao tema:</h4>
+              <PalavraOriginal termo="ágape" />
+              <PalavraOriginal termo="filéo" />
+              <PalavraOriginal termo="eros" />
+              <PalavraOriginal termo="storge" />
+            </div>
+          )}
+          {/* Enriquecimento automático */}
+          {enriquecimento && (
+            <div style={{ margin: '32px 0', background: '#fafdff', padding: 16, borderRadius: 8, border: '1px solid #e0e0e0' }}>
+              <h4>Informações adicionais sobre o tema</h4>
+              {enriquecimento.mapa && (
+                <div style={{ marginBottom: 12 }}>
+                  <b>Local:</b> {enriquecimento.mapa.nome}<br />
+                  <b>Coordenadas:</b> {enriquecimento.mapa.latitude}, {enriquecimento.mapa.longitude}<br />
+                  <a href={enriquecimento.mapa.mapa} target="_blank" rel="noopener noreferrer">Ver mapa interativo</a><br />
+                  {enriquecimento.mapa.descricao && <p>{enriquecimento.mapa.descricao}</p>}
+                </div>
+              )}
+              {enriquecimento.imagens && enriquecimento.imagens.imagens && enriquecimento.imagens.imagens.length > 0 && (
+                <div style={{ marginBottom: 12 }}>
+                  <b>Imagens públicas:</b><br />
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    {enriquecimento.imagens.imagens.map((img, i) => <img key={i} src={img} alt="Imagem bíblica" style={{ maxHeight: 100, borderRadius: 4 }} />)}
+                  </div>
+                </div>
+              )}
+              {enriquecimento.dados && (
+                <div style={{ marginBottom: 12 }}>
+                  <b>História/Cultura:</b><br />
+                  <a href={enriquecimento.dados.wikipedia} target="_blank" rel="noopener noreferrer">{enriquecimento.dados.label}</a><br />
+                  <span>{enriquecimento.dados.resumo}</span>
+                </div>
+              )}
+              {enriquecimento.artefatos && (
+                <div style={{ marginBottom: 12 }}>
+                  <b>Artefatos e manuscritos:</b><br />
+                  <a href={enriquecimento.artefatos.deadSeaScrolls} target="_blank" rel="noopener noreferrer">Manuscritos do Mar Morto</a> |{' '}
+                  <a href={enriquecimento.artefatos.britishMuseum} target="_blank" rel="noopener noreferrer">British Museum</a>
+                </div>
+              )}
+            </div>
+          )}
           <SermonExport sermon={sermon} token={localStorage.getItem('token')} />
           <SermonShare sermon={sermon} token={localStorage.getItem('token')} />
+          <div style={{ marginTop: 32, background: '#f8f8ff', padding: 16, borderRadius: 8, border: '1px solid #e0e0e0' }}>
+            <h3 style={{ textAlign: 'center', marginBottom: 12 }}>Conheça os planos do Eklesia IA</h3>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+              <thead>
+                <tr style={{ background: '#f0f0f0' }}>
+                  <th>Plano</th>
+                  <th>Valor</th>
+                  <th>Recursos</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Gratuito</td>
+                  <td>R$ 0/mês</td>
+                  <td>10 buscas/mês, 1 PDF, recursos básicos</td>
+                </tr>
+                <tr>
+                  <td>Pessoal</td>
+                  <td>R$ 29/mês</td>
+                  <td>Ilimitado para 1 usuário, exportação, WhatsApp, IA básica</td>
+                </tr>
+                <tr>
+                  <td>Igreja</td>
+                  <td>R$ 99/mês</td>
+                  <td>Até 10 usuários, tudo ilimitado, suporte prioritário, relatórios</td>
+                </tr>
+                <tr>
+                  <td>Avançado</td>
+                  <td>R$ 199/mês</td>
+                  <td>Ilimitado, recursos premium (API, integrações avançadas, customização)</td>
+                </tr>
+              </tbody>
+            </table>
+            <p style={{ textAlign: 'center', marginTop: 10 }}>
+              <a href="https://ia.eklesia.app.br" target="_blank" rel="noopener noreferrer">Assine já e tenha acesso completo!</a>
+            </p>
+          </div>
           <form style={{ marginTop: 16 }} onSubmit={async e => {
             e.preventDefault();
             if (!refineInput.trim()) return;

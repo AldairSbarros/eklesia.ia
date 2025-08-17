@@ -17,24 +17,30 @@
    ```
 3. Acesse em [http://localhost:5173](http://localhost:5173) (ajuste porta se necessário)
 
+
 ## Funcionalidades
 - Login/cadastro de usuário (JWT)
 - Assistente de sermão com IA (Ollama)
 - Ingestão de arquivos (PDF, DOCX, HTML)
 - Busca semântica
 - Exploração de bíblias (idioma, versão, texto, áudio, vídeo)
+- Explorador Bíblico: mapas, imagens, dados históricos/culturais, artefatos
+- Consulta de palavras originais (hebraico/grego): escrita, significado, transliteração, pronúncia, exemplos
+- Análise hermenêutica e semântica via IA (Ollama): explicação, contexto, aplicações, exegese
 - Painel do usuário (arquivos, pagamentos)
 - Monetização (Pix/PagSeguro)
 - Exportação de sermão em PDF
 - Compartilhamento de sermão por link público e WhatsApp
 
+
 ## Estrutura
 - `src/App.jsx`: componente principal, controle de autenticação
-- `src/components/`: componentes de UI (assistente, ingestão, busca, painel, pagamentos, exportação, compartilhamento)
+- `src/components/`: componentes de UI (assistente, ingestão, busca, painel, pagamentos, exportação, compartilhamento, Explorador Bíblico, PalavraOriginal, HermeneuticaBox)
 - `src/pages/Compartilhar.jsx`: página pública de sermão compartilhado
 
+
 ## Rotas principais
-- `/`: painel completo (autenticado)
+- `/`: painel completo (autenticado), inclui Explorador Bíblico, análise hermenêutica, consulta ao original
 - `/compartilhar/:shareId`: página pública de sermão compartilhado
 
 ## Docker

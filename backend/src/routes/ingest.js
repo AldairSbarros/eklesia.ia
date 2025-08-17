@@ -5,6 +5,8 @@ import multer from 'multer';
 import pdfParse from 'pdf-parse';
 import fs from 'fs';
 import path from 'path';
+import mammoth from 'mammoth';
+import { JSDOM } from 'jsdom';
 
 import { PrismaClient } from '@prisma/client';
 import { gerarEmbedding } from '../semantic/embedding.js';
@@ -15,6 +17,7 @@ const router = express.Router();
 const upload = multer({ dest: 'uploads/' });
 const prisma = new PrismaClient();
 
+// PDF
 router.post('/pdf', requireAuth, upload.single('file'), async (req, res) => {
   try {
     const filePath = req.file.path;
@@ -36,8 +39,8 @@ router.post('/pdf', requireAuth, upload.single('file'), async (req, res) => {
     res.status(500).json({ error: 'Erro ao processar PDF', details: err.message });
   }
 });
-  try {
-    const filePath = req.file.path;
+
+// DOCX
 router.post('/docx', requireAuth, upload.single('file'), async (req, res) => {
   try {
     const filePath = req.file.path;
@@ -58,8 +61,8 @@ router.post('/docx', requireAuth, upload.single('file'), async (req, res) => {
     res.status(500).json({ error: 'Erro ao processar DOCX', details: err.message });
   }
 });
-  try {
-    const filePath = req.file.path;
+
+// HTML
 router.post('/html', requireAuth, upload.single('file'), async (req, res) => {
   try {
     const filePath = req.file.path;
@@ -82,3 +85,5 @@ router.post('/html', requireAuth, upload.single('file'), async (req, res) => {
     res.status(500).json({ error: 'Erro ao processar HTML', details: err.message });
   }
 });
+
+export default router;

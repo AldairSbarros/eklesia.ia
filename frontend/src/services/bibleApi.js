@@ -1,7 +1,7 @@
 // Serviço para consumir a API de Bíblia do backend
 import axios from 'axios';
 
-const API_BASE = 'http://localhost:3001/biblex'; // ajuste se backend estiver em outro endereço
+const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:3001') + '/biblex'; // ajuste se backend estiver em outro endereço
 
 export const getLanguages = async () => {
   const { data } = await axios.get(`${API_BASE}/languages`);

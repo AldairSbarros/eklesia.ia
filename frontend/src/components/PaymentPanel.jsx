@@ -24,7 +24,39 @@ export default function PaymentPanel({ token }) {
 
   return (
     <div style={{ margin: '32px 0', padding: 16, border: '1px solid #ccc', borderRadius: 8 }}>
-      <h2>Assinar Plano</h2>
+      <h2>Planos e Assinaturas</h2>
+      <table style={{ width: '100%', marginBottom: 24, borderCollapse: 'collapse' }}>
+        <thead>
+          <tr style={{ background: '#f0f0f0' }}>
+            <th>Plano</th>
+            <th>Valor</th>
+            <th>Recursos</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Gratuito</td>
+            <td>R$ 0/mês</td>
+            <td>10 buscas/mês, 1 PDF, recursos básicos</td>
+          </tr>
+          <tr>
+            <td>Pessoal</td>
+            <td>R$ 29/mês</td>
+            <td>Ilimitado para 1 usuário, exportação, WhatsApp, IA básica</td>
+          </tr>
+          <tr>
+            <td>Igreja</td>
+            <td>R$ 99/mês</td>
+            <td>Até 10 usuários, tudo ilimitado, suporte prioritário, relatórios</td>
+          </tr>
+          <tr>
+            <td>Avançado</td>
+            <td>R$ 199/mês</td>
+            <td>Ilimitado, recursos premium (API, integrações avançadas, customização)</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3>Assinar Agora</h3>
       <form onSubmit={handlePayment}>
         <label>Valor (R$):</label>
         <input type="number" min={1} value={amount} onChange={e => setAmount(e.target.value)} required />

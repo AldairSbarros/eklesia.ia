@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-export default function UserPanel({ token }) {
+export default function UserPanel({ token, user }) {
   const [files, setFiles] = useState([]);
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,6 +28,21 @@ export default function UserPanel({ token }) {
   return (
     <div style={{ margin: '32px 0', padding: 16, border: '1px solid #ccc', borderRadius: 8 }}>
       <h2>Painel do Usuário</h2>
+      <div style={{ marginBottom: 12 }}>
+        <b>Tipo de usuário:</b> {user?.role === 'superuser'
+          ? 'SUPERUSER (ACESSO TOTAL)'
+          : user?.role === 'admin'
+            ? 'Administrador'
+            : user?.role === 'premium'
+              ? 'Assinante Premium'
+              : user?.role === 'personal'
+                ? 'Plano Pessoal'
+                : user?.role === 'church'
+                  ? 'Plano Igreja'
+                  : user?.role === 'advanced'
+                    ? 'Plano Avançado'
+                    : 'Usuário Gratuito'}
+      </div>
       {loading ? <p>Carregando...</p> : (
         <>
           <h3>Meus Arquivos/Textos Ingeridos</h3>
@@ -45,8 +60,9 @@ export default function UserPanel({ token }) {
           </ul>
           <h3>Pagamentos</h3>
           <ul>
-            {payments.length === 0 && <li>Nenhum pagamento encontrado.</li>}
-            {payments.map(p => (
+            {user?.role === 'superuser' && <li>ACESSO TOTAL - Nenhum pagamento necessário.</li>}
+            {user?.role !== 'superuser' && payments.length === 0 && <li>Nenhum pagamento encontrado.</li>}
+            {user?.role !== 'superuser' && payments.map(p => (
               <li key={p.id}>
                 <b>Status:</b> {p.status} | <b>Método:</b> {p.method} | <b>Valor:</b> R$ {p.amount.toFixed(2)} | <b>Data:</b> {new Date(p.createdAt).toLocaleString()}
               </li>

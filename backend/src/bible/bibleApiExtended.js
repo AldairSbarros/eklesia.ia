@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const BIBLE_API_URL = 'https://4.dbt.io/api';
-const BIBLE_API_KEY = process.env.BIBLE_API_KEY || '2c893a54-d251-4d35-8566-85856045c2f8';
+const BIBLE_API_KEY = process.env.BIBLE_API_KEY;
 
 export async function listarIdiomas() {
   const params = { key: BIBLE_API_KEY, v: 2 };

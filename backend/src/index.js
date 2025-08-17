@@ -14,6 +14,7 @@ import userRouter from './routes/user.js';
 import paymentRouter from './routes/payment.js';
 import sermonRouter from './routes/sermon.js';
 import shareRouter from './routes/share.js';
+import hermeneuticsRouter from './routes/hermeneutics.js';
 // ... outros imports necessários
 
 const app = express();
@@ -47,9 +48,10 @@ app.use('/user', userRouter);
 app.use('/payment', paymentRouter);
 
 // Rotas de sermão (exportação, compartilhamento)
+
 app.use('/sermon', sermonRouter);
-// Rotas de compartilhamento
 app.use('/share', shareRouter);
+app.use('/bible', hermeneuticsRouter); // /bible/hermeneutics
 
 
 app.get('/', (req, res) => {

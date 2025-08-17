@@ -25,12 +25,18 @@ datasource db {
 }
 
 model User {
+
   id        Int      @id @default(autoincrement())
   email     String   @unique
   password  String
   name      String?
+  role      String   @default("user") // user, admin, superuser
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  sharedSermons SharedSermon[]
+  payments      Payment[]
+  ingestedTexts IngestedText[]
 }
 
 model Payment {
@@ -50,7 +56,7 @@ model IngestedText {
   userId    Int?
   filename  String
   text      String
-  embedding Vector? @db.Vector(384) // 384 dimensões para MiniLM, ajuste conforme modelo
+  embedding Float[] // 384 dimensões para MiniLM, ajuste conforme modelo
   createdAt DateTime @default(now())
   user      User?    @relation(fields: [userId], references: [id])
 }

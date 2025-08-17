@@ -13,9 +13,9 @@ router.post('/register', async (req, res) => {
   if (!email || !password) return res.status(400).json({ error: 'Email e senha obrigatórios' });
   try {
     const hash = await bcrypt.hash(password, 10);
-    const user = await prisma.user.create({ data: { email, password: hash, name } });
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token, user: { id: user.id, email: user.email, name: user.name } });
+  const user = await prisma.user.create({ data: { email, password: hash, name } });
+  const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
+  res.json({ token, user: { id: user.id, email: user.email, name: user.name, role: user.role } });
   } catch (err) {
     res.status(400).json({ error: 'Erro ao cadastrar', details: err.message });
   }
@@ -31,7 +31,7 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Credenciais inválidas' });
     }
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token, user: { id: user.id, email: user.email, name: user.name } });
+  res.json({ token, user: { id: user.id, email: user.email, name: user.name, role: user.role } });
   } catch (err) {
     res.status(400).json({ error: 'Erro ao logar', details: err.message });
   }

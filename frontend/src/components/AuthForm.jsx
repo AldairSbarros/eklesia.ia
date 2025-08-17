@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { login, register } from '../services/authApi';
+import logo from '../assets/EklesiaKonecta-xOe6Dru8.png';
+import Footer from './Footer';
 
 export default function AuthForm({ onAuth }) {
   const [mode, setMode] = useState('login');
@@ -28,32 +30,39 @@ export default function AuthForm({ onAuth }) {
   };
 
   return (
-    <div style={{ maxWidth: 350, margin: '32px auto', padding: 24, border: '1px solid #ccc', borderRadius: 8 }}>
-      <h2>{mode === 'login' ? 'Entrar' : 'Cadastrar'}</h2>
-      <form onSubmit={handleSubmit}>
-        {mode === 'register' && (
-          <div>
-            <label>Nome:</label>
-            <input value={name} onChange={e => setName(e.target.value)} required style={{ width: '100%' }} />
-          </div>
-        )}
-        <div>
-          <label>Email:</label>
-          <input type="email" value={email} onChange={e => setEmail(e.target.value)} required style={{ width: '100%' }} />
+    <div style={{ minHeight: '100vh', background: '#f3f6fa', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ maxWidth: 370, width: '100%', margin: '0 auto', padding: 32, background: '#e3eaf3', borderRadius: 16, boxShadow: '0 4px 32px #b6c2e122', textAlign: 'center' }}>
+          <img src={logo} alt="Logo Eklesia IA" style={{ width: 90, marginBottom: 4 }} />
+          <div style={{ fontWeight: 700, fontSize: 22, color: '#2a2a6a', marginBottom: 12 }}>Eklesia IA</div>
+          {/* Título removido, pois já existe botão de entrar */}
+          <form onSubmit={handleSubmit} style={{ textAlign: 'left' }}>
+            {mode === 'register' && (
+              <div style={{ marginBottom: 12 }}>
+                <label style={{ fontWeight: 500 }}>Nome:</label>
+                <input value={name} onChange={e => setName(e.target.value)} required style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #b6c2e1', marginTop: 2 }} />
+              </div>
+            )}
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ fontWeight: 500 }}>Email:</label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} required style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #b6c2e1', marginTop: 2 }} />
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ fontWeight: 500 }}>Senha:</label>
+              <input type="password" value={password} onChange={e => setPassword(e.target.value)} required style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #b6c2e1', marginTop: 2 }} />
+            </div>
+            {error && <p style={{ color: 'red', margin: '8px 0' }}>{error}</p>}
+            <button type="submit" disabled={loading} style={{ width: '100%', padding: 10, borderRadius: 6, background: '#2a2a6a', color: '#fff', fontWeight: 600, border: 'none', marginTop: 8, fontSize: 16, cursor: 'pointer' }}>{loading ? 'Aguarde...' : (mode === 'login' ? 'Entrar' : 'Cadastrar')}</button>
+          </form>
+          <p style={{ marginTop: 18, fontSize: 15 }}>
+            {mode === 'login' ? 'Não tem conta?' : 'Já tem conta?'}{' '}
+            <button onClick={() => setMode(mode === 'login' ? 'register' : 'login')} style={{ border: 'none', background: 'none', color: '#2a2a6a', cursor: 'pointer', fontWeight: 600, fontSize: 15 }}>
+              {mode === 'login' ? 'Cadastre-se' : 'Entrar'}
+            </button>
+          </p>
         </div>
-        <div>
-          <label>Senha:</label>
-          <input type="password" value={password} onChange={e => setPassword(e.target.value)} required style={{ width: '100%' }} />
-        </div>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        <button type="submit" disabled={loading}>{loading ? 'Aguarde...' : (mode === 'login' ? 'Entrar' : 'Cadastrar')}</button>
-      </form>
-      <p style={{ marginTop: 12 }}>
-        {mode === 'login' ? 'Não tem conta?' : 'Já tem conta?'}{' '}
-        <button onClick={() => setMode(mode === 'login' ? 'register' : 'login')} style={{ border: 'none', background: 'none', color: '#2a2a6a', cursor: 'pointer' }}>
-          {mode === 'login' ? 'Cadastre-se' : 'Entrar'}
-        </button>
-      </p>
+      </div>
+      <Footer />
     </div>
   );
 }

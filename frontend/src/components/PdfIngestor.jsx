@@ -1,4 +1,7 @@
 
+import React, { useState } from 'react';
+import axios from 'axios';
+
 export default function PdfIngestor() {
   const [file, setFile] = useState(null);
   const [fileType, setFileType] = useState('pdf');

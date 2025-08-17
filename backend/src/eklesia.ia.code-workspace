@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "../.."
+		},
+		{
+			"path": "../../../eklesia-ia-backend"
+		},
+		{
+			"path": "../../../eklesia-ia-frontend"
+		},
+		{
+			"path": "../../../eklesia-ia-scripts"
+		}
+	],
+	"settings": {}
+}
